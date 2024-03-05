@@ -1,6 +1,6 @@
 import 'package:crypto_app/core/extensions/context_extensions.dart';
 import 'package:crypto_app/src/coins/domain/models/coin.dart';
-import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coin_cubit.dart';
+import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coins_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/components/coin_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,13 +62,33 @@ class CoinList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ListView.builder(
-          itemCount: coins.length,
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return CoinItem(coin: coins[index]);
+        padding: const EdgeInsets.all(8.0),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<CoinsCubit>().getAllCoins();
           },
+          child: ListView.builder(
+            itemCount: coins.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return CoinItem(coin: coins[index]);
+            },
+          ),
         ));
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child:
+  //           ListView.separated(
+  //         separatorBuilder: (context, index) => const Divider(
+  //           color: Colors.grey,
+  //         ),
+  //         itemCount: coins.length,
+  //         shrinkWrap: true,
+  //         itemBuilder: (context, index) => CoinItem(coin: coins[index]),
+  //       ));
+  // }
 }

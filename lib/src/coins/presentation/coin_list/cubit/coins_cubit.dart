@@ -3,7 +3,7 @@ import 'package:crypto_app/src/coins/domain/models/coin.dart';
 import 'package:crypto_app/src/coins/domain/usecases/get_all_coins.dart';
 import 'package:equatable/equatable.dart';
 
-part 'coin_state.dart';
+part 'coins_state.dart';
 
 class CoinsCubit extends Cubit<CoinsState> {
   CoinsCubit({required GetAllCoins getAllCoins})

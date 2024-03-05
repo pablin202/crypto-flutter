@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class Response<T> extends Equatable {
   final dynamic timestamp;
-  final List<T> data;
+  final T data;
 
   const Response({required this.timestamp, required this.data});
 

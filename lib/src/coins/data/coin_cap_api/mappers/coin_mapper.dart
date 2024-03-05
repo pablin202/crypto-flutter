@@ -11,22 +11,28 @@ extension CoinEntityExt on CoinEntity {
         imageUrl:
             "https://assets.coincap.io/assets/icons/${symbol.toLowerCase()}@2x.png",
         usdPrice: priceUsd!.toPrice(),
-        changePercent24Hr: changePercent24Hr!.toPercent());
+        changePercent24Hr: changePercent24Hr!.toPercent(),
+        supply: supply,
+        maxSupply: maxSupply,
+        marketCapUsd: marketCapUsd,
+        volumeUsd24Hr: volumeUsd24Hr,
+        vwap24Hr: vwap24Hr,
+        explorer: explorer);
   }
 }
 
 extension StringExt on String {
   String toPrice() {
-    var splitedValue = split('.');
-    if (splitedValue[0].startsWith("0")) {
-      return "${splitedValue[0]}.${splitedValue[1].substring(0, 6)}";
+    var splitValue = split('.');
+    if (splitValue[0].startsWith("0")) {
+      return "${splitValue[0]}.${splitValue[1].substring(0, 8)}";
     } else {
-      return "${splitedValue[0]}.${splitedValue[1].substring(0, 2)}";
+      return "${splitValue[0]}.${splitValue[1].substring(0, 2)}";
     }
   }
 
   String toPercent() {
-    var splitedValue = split('.');
-    return "${splitedValue[0]}.${splitedValue[1].substring(0, 2)}";
+    var splitValue = split('.');
+    return "${splitValue[0]}.${splitValue[1].substring(0, 2)}";
   }
 }

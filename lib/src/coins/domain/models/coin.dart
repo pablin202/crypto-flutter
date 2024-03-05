@@ -8,7 +8,13 @@ class Coin extends Equatable {
       required this.symbol,
       required this.imageUrl,
       required this.usdPrice,
-      required this.changePercent24Hr});
+      required this.changePercent24Hr,
+      required this.supply,
+      required this.maxSupply,
+      required this.marketCapUsd,
+      required this.volumeUsd24Hr,
+      required this.vwap24Hr,
+      required this.explorer});
 
   final String id;
   final String name;
@@ -17,6 +23,12 @@ class Coin extends Equatable {
   final String imageUrl;
   final String usdPrice;
   final String changePercent24Hr;
+  final String? supply;
+  final String? maxSupply;
+  final String? marketCapUsd;
+  final String? volumeUsd24Hr;
+  final String? vwap24Hr;
+  final String? explorer;
 
   @override
   List<Object?> get props => [id, name, symbol];

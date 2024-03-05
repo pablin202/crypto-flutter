@@ -1,4 +1,7 @@
-import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coin_cubit.dart';
+import 'package:crypto_app/src/coins/presentation/coin_details/cubit/coin_cubit.dart';
+import 'package:crypto_app/src/coins/presentation/coin_details/cubit/history_cubit.dart';
+import 'package:crypto_app/src/coins/presentation/coin_details/views/coin_screen.dart';
+import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coins_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_list/views/coins_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +14,21 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         (_) => BlocProvider(
           create: (_) => sl<CoinsCubit>(),
           child: const CoinsScreen(),
+        ),
+        settings: settings,
+      );
+    case CoinScreen.routeName:
+      return _pageBuilder(
+        (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider<CoinCubit>(
+              create: (_) => sl<CoinCubit>(),
+            ),
+            BlocProvider<HistoryCubit>(
+              create: (_) => sl<HistoryCubit>(),
+            ),
+          ],
+          child: const CoinScreen(),
         ),
         settings: settings,
       );
