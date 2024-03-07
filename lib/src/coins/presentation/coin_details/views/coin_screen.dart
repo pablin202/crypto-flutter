@@ -1,16 +1,17 @@
 import 'dart:math';
-import 'dart:ui';
-
-import 'package:crypto_app/core/extensions/context_extensions.dart';
-import 'package:crypto_app/src/coins/domain/models/history.dart';
+import 'package:crypto_app/core/extensions/util_extensions.dart';
+import 'package:crypto_app/core/utils/number_utils.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/cubit/coin_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/cubit/history_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/navigation/coin_details_args.dart';
 import 'package:crypto_app/src/coins/presentation/components/circular_image.dart';
+import 'package:crypto_app/src/coins/presentation/components/spacers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+
+import '../../components/progress_loading.dart';
 
 class CoinScreen extends StatefulWidget {
   const CoinScreen({super.key});
@@ -22,11 +23,6 @@ class CoinScreen extends StatefulWidget {
 }
 
 class _CoinScreenState extends State<CoinScreen> {
-  List<Color> gradientColors = [
-    Colors.blueAccent,
-    Colors.blue,
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -37,7 +33,7 @@ class _CoinScreenState extends State<CoinScreen> {
     final args = ModalRoute.of(context)!.settings.arguments
         as CoinDetailsScreenArguments;
     context.read<CoinCubit>().getCoinById(args.id);
-    context.read<HistoryCubit>().getOnDayHistory(args.id);
+    context.read<HistoryCubit>().getOneDayHistory(args.id);
 
     return Scaffold(
         appBar: AppBar(
@@ -51,105 +47,76 @@ class _CoinScreenState extends State<CoinScreen> {
             if (state is CoinLoaded) {}
           }, builder: (BuildContext context, CoinState state) {
             if (state is GettingCoin) {
-              return Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    context.theme.colorScheme.secondary,
-                  ),
-                ),
+              return const Center(
+                child: ProgressLoader(),
               );
             }
 
             if (state is CoinLoaded) {
-              return SizedBox(
-                  // this row has full width
-                  width: double.maxFinite,
-                  child: Column(children: [
-                    CircularImage(
-                      image: state.coin.imageUrl,
-                      width: 100.0,
-                      height: 100.0,
-                    ),
-                    Text(
-                      "\$${state.coin.usdPrice}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 32.0),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (state.coin.changePercent24Hr.startsWith("-"))
-                          Icon(
-                            Icons.trending_down,
-                            color: Colors.red.shade400,
-                            size: 20.0,
-                            semanticLabel: 'down',
-                          ),
-                        if (state.coin.changePercent24Hr.startsWith("-"))
-                          Text(
-                            "${state.coin.changePercent24Hr}%",
-                            style: TextStyle(
-                                color: Colors.red.shade400, fontSize: 20.0),
-                          ),
-                        if (!state.coin.changePercent24Hr.startsWith("-"))
-                          Icon(
-                            Icons.trending_up_rounded,
-                            color: Colors.green.shade400,
-                            size: 20.0,
-                            semanticLabel: 'up',
-                          ),
-                        if (!state.coin.changePercent24Hr.startsWith("-"))
-                          Text(
-                            "${state.coin.changePercent24Hr}%",
-                            style: TextStyle(
-                                color: Colors.green.shade400, fontSize: 20.0),
-                          )
-                      ],
-                    ),
-                  ]));
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: SizedBox(
+                    // this row has full width
+                    width: double.maxFinite,
+                    child: Column(children: [
+                      CircularImage(
+                        image: state.coin.imageUrl,
+                        width: 60.0,
+                        height: 60.0,
+                      ),
+                      Text(
+                        "\$${state.coin.usdPrice}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 32.0),
+                      ),
+                    ])),
+              );
             }
 
             return const Placeholder();
           }),
-          const SizedBox(
-            height: 16,
-          ),
+          const SmallHorizontalSpacer(),
           BlocConsumer<HistoryCubit, HistoryState>(
               listener: (BuildContext context, HistoryState state) {},
               builder: (BuildContext context, HistoryState state) {
-                if (state is GettingCoin) {
-                  return const CircularProgressIndicator();
+                if (state is GettingHistory) {
+                  return const SizedBox(
+                    width: double.infinity,
+                    height: 248.0,
+                    child: Center(child: ProgressLoader()),
+                  );
                 }
                 if (state is HistoryLoaded) {
+                  var values = state.history.map((e) => e.priceUsd).toList();
+
+                  var percent =
+                      calculatePercentageDifference(values.first, values.last);
+
                   return SizedBox(
                     child: Opacity(
                       opacity: 1,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(bottom: 8.0),
                         child: Column(
                           children: [
+                            Container(
+                              width: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: SizedBox(
+                                height: 24.0,
+                                child:
+                                    PercentText(value: percent),
+                              ),
+                            ),
+                            const LargeHorizontalSpacer(),
                             SizedBox(
                               width: double.infinity,
                               height: 200.0,
                               child: LineChart(
-                                mainData(state.history
-                                    .map((e) => double.tryParse(e.priceUsd)!)
-                                    .toList()),
-                                swapAnimationDuration: const Duration(seconds: 0),
+                                mainData(values),
+                                swapAnimationDuration:
+                                    const Duration(seconds: 0),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            ToggleSwitch(
-                              initialLabelIndex: 0,
-                              totalSwitches: 5,
-                              labels: const ['1D', '1W', '1M', '6M', '1Y'],
-                              animate: true, // with just animate set to true, default curve = Curves.easeIn
-                              curve: Curves.elasticOut, //
-                              onToggle: (index) {
-                                print('switched to: $index');
-                              },
                             ),
                           ],
                         ),
@@ -157,13 +124,44 @@ class _CoinScreenState extends State<CoinScreen> {
                     ),
                   );
                 }
-
                 return const Placeholder();
-              })
+              }),
+          const LargeHorizontalSpacer(),
+          ToggleSwitch(
+            minWidth: double.infinity,
+            activeBgColor: const [Colors.green],
+            inactiveBgColor: Colors.green.shade50,
+            inactiveFgColor: Colors.green,
+            initialLabelIndex: 0,
+            totalSwitches: 5,
+            labels: const ['1D', '1W', '1M', '6M', '1Y'],
+            onToggle: (index) {
+              switch (index) {
+                case 0:
+                  context.read<HistoryCubit>().getOneDayHistory(args.id);
+                case 1:
+                  context.read<HistoryCubit>().getOneWeekHistory(args.id);
+                case 2:
+                  context.read<HistoryCubit>().getOneMonthHistory(args.id);
+                case 3:
+                  context.read<HistoryCubit>().getSixMonthHistory(args.id);
+                case 4:
+                  context.read<HistoryCubit>().getOneYearHistory(args.id);
+              }
+            },
+          ),
         ]));
   }
 
   LineChartData mainData(List<double> data) {
+    var color = data.first.toDouble() < data.last.toDouble()
+        ? Colors.green
+        : Colors.red;
+
+    var colorGbBar = data.first.toDouble() < data.last.toDouble()
+        ? Colors.greenAccent
+        : Colors.redAccent;
+
     return LineChartData(
       gridData: FlGridData(
         show: true,
@@ -195,16 +193,24 @@ class _CoinScreenState extends State<CoinScreen> {
       maxY: data.reduce(max).toDouble(),
       lineBarsData: [
         LineChartBarData(
+          isCurved: true,
           spots: listData(data),
-          color: Colors.green,
+          color: color,
           barWidth: 3,
           isStrokeCapRound: true,
           dotData: FlDotData(
             show: false,
           ),
           belowBarData: BarAreaData(
-            show: false,
-            color: Colors.greenAccent,
+            show: true,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colorGbBar, // Start color
+                colorGbBar.withOpacity(0.0), // End color (transparent)
+              ],
+            ),
           ),
         ),
       ],
@@ -218,9 +224,35 @@ class _CoinScreenState extends State<CoinScreen> {
   }
 }
 
-extension IndexedIterable<E> on Iterable<E> {
-  Iterable<T> mapIndexed<T>(T Function(E e, int i) f) {
-    var i = 0;
-    return map((e) => f(e, i++));
+class PercentText extends StatelessWidget {
+  final double value;
+
+  const PercentText({super.key, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    var icon = (value < 0) ? Icons.trending_down : Icons.trending_up_rounded;
+    var color = (value < 0) ? Colors.red.shade400 : Colors.green.shade400;
+
+    return Center(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.ideographic,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 20.0,
+            semanticLabel: '',
+          ),
+          Text(
+            "${value.toString()}%",
+            style: TextStyle(
+                color: color, fontWeight: FontWeight.bold, fontSize: 20.0),
+          ),
+        ],
+      ),
+    );
   }
 }

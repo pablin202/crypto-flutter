@@ -9,8 +9,6 @@ import 'package:crypto_app/src/coins/domain/models/history.dart';
 import 'package:crypto_app/src/coins/domain/repositories/coins_repository.dart';
 import 'package:dartz/dartz.dart';
 
-import '../../../domain/models/intervals.dart';
-
 class CoinsRepositoryImpl extends CoinsRepository {
   final CoinCapRemoteDataSource _remoteDataSource;
 

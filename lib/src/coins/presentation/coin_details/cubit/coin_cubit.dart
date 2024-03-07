@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:crypto_app/src/coins/domain/models/coin.dart';
-import 'package:crypto_app/src/coins/domain/models/history.dart';
 import 'package:crypto_app/src/coins/domain/usecases/get_coin_by_id.dart';
 import 'package:equatable/equatable.dart';
 

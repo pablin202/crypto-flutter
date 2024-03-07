@@ -6,7 +6,7 @@ class History extends Equatable {
         required this.time,
         required this.date});
 
-  final String priceUsd;
+  final double priceUsd;
   final int time;
   final String date;
 
