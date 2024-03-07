@@ -1,4 +1,5 @@
 import 'package:crypto_app/src/coins/domain/models/coin.dart';
+import 'package:crypto_app/src/coins/domain/models/value_style.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/navigation/coin_details_args.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/views/coin_screen.dart';
 import 'package:crypto_app/src/coins/presentation/components/circular_image.dart';
@@ -16,10 +17,7 @@ class CoinItem extends StatelessWidget {
           Navigator.pushNamed(
             context,
             CoinScreen.routeName,
-            arguments: CoinDetailsScreenArguments(
-              coin.id,
-              coin.name
-            ),
+            arguments: CoinDetailsScreenArguments(coin.id, coin.name),
           );
         },
         leading: CircularImage(
@@ -43,6 +41,10 @@ class CoinValues extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var valueStyle = (coin.changePercent24Hr < 0)
+        ? ValueStyle.negative()
+        : ValueStyle.positive();
+
     return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -56,30 +58,16 @@ class CoinValues extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (coin.changePercent24Hr.startsWith("-"))
-                Icon(
-                  Icons.trending_down,
-                  color: Colors.red.shade400,
-                  size: 12.0,
-                  semanticLabel: 'down',
-                ),
-              if (coin.changePercent24Hr.startsWith("-"))
-                Text(
-                  "${coin.changePercent24Hr}%",
-                  style: TextStyle(color: Colors.red.shade400),
-                ),
-              if (!coin.changePercent24Hr.startsWith("-"))
-                Icon(
-                  Icons.trending_up_rounded,
-                  color: Colors.green.shade400,
-                  size: 12.0,
-                  semanticLabel: 'up',
-                ),
-              if (!coin.changePercent24Hr.startsWith("-"))
-                Text(
-                  "${coin.changePercent24Hr}%",
-                  style: TextStyle(color: Colors.green.shade400),
-                )
+              Icon(
+                valueStyle.icon,
+                color: valueStyle.color,
+                size: 12.0,
+                semanticLabel: 'icon_value',
+              ),
+              Text(
+                "${coin.changePercent24Hr}%",
+                style: TextStyle(color: valueStyle.color),
+              ),
             ],
           )
         ]);

@@ -21,8 +21,8 @@ class Coin extends Equatable {
   final int rank;
   final String symbol;
   final String imageUrl;
-  final String usdPrice;
-  final String changePercent24Hr;
+  final double usdPrice;
+  final double changePercent24Hr;
   final String? supply;
   final String? maxSupply;
   final String? marketCapUsd;

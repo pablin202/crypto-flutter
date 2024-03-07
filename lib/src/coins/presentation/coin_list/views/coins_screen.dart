@@ -76,19 +76,4 @@ class CoinList extends StatelessWidget {
           ),
         ));
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child:
-  //           ListView.separated(
-  //         separatorBuilder: (context, index) => const Divider(
-  //           color: Colors.grey,
-  //         ),
-  //         itemCount: coins.length,
-  //         shrinkWrap: true,
-  //         itemBuilder: (context, index) => CoinItem(coin: coins[index]),
-  //       ));
-  // }
 }

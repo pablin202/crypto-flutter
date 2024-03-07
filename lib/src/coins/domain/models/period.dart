@@ -10,8 +10,6 @@ int getUtcTime(Duration duration) =>
 Period getPeriod(Duration duration) {
   var endTime = getActualUtcTime();
   var startTime = getUtcTime(duration);
-  log(startTime);
-  log(endTime);
   return Period(start: startTime, end: endTime);
 }
 

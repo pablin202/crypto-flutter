@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:crypto_app/core/extensions/util_extensions.dart';
 import 'package:crypto_app/core/utils/number_utils.dart';
+import 'package:crypto_app/src/coins/domain/models/value_style.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/cubit/coin_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/cubit/history_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/navigation/coin_details_args.dart';
@@ -104,8 +105,7 @@ class _CoinScreenState extends State<CoinScreen> {
                               alignment: Alignment.topCenter,
                               child: SizedBox(
                                 height: 24.0,
-                                child:
-                                    PercentText(value: percent),
+                                child: PercentText(value: percent),
                               ),
                             ),
                             const LargeHorizontalSpacer(),
@@ -231,8 +231,8 @@ class PercentText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var icon = (value < 0) ? Icons.trending_down : Icons.trending_up_rounded;
-    var color = (value < 0) ? Colors.red.shade400 : Colors.green.shade400;
+    var valueStyle =
+        (value < 0) ? ValueStyle.negative() : ValueStyle.positive();
 
     return Center(
       child: Row(
@@ -241,15 +241,17 @@ class PercentText extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            icon,
-            color: color,
+            valueStyle.icon,
+            color: valueStyle.color,
             size: 20.0,
             semanticLabel: '',
           ),
           Text(
             "${value.toString()}%",
             style: TextStyle(
-                color: color, fontWeight: FontWeight.bold, fontSize: 20.0),
+                color: valueStyle.color,
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0),
           ),
         ],
       ),
