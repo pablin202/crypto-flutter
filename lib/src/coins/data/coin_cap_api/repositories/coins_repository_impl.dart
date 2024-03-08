@@ -4,8 +4,10 @@ import 'package:crypto_app/core/utils/typedefs.dart';
 import 'package:crypto_app/src/coins/data/coin_cap_api/datasource/coin_cap_remote_datasource.dart';
 import 'package:crypto_app/src/coins/data/coin_cap_api/mappers/coin_mapper.dart';
 import 'package:crypto_app/src/coins/data/coin_cap_api/mappers/history_mapper.dart';
+import 'package:crypto_app/src/coins/data/coin_cap_api/mappers/rates_mapper.dart';
 import 'package:crypto_app/src/coins/domain/models/coin.dart';
 import 'package:crypto_app/src/coins/domain/models/history.dart';
+import 'package:crypto_app/src/coins/domain/models/rates.dart';
 import 'package:crypto_app/src/coins/domain/repositories/coins_repository.dart';
 import 'package:dartz/dartz.dart';
 
@@ -46,6 +48,27 @@ class CoinsRepositoryImpl extends CoinsRepository {
       final history =
           result.data.map((history) => history.toHistory()!).toList();
       return Right(history);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(statusCode: e.statusCode, message: e.message));
+    }
+  }
+
+  @override
+  ResultFuture<List<Rate>> getRates() async {
+    try {
+      final result = await _remoteDataSource.getAllRates();
+      final rates = result.data.map((rate) => rate.toRate()!).toList();
+      return Right(rates);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(statusCode: e.statusCode, message: e.message));
+    }
+  }
+
+  @override
+  ResultFuture<Rate> getRateById(String id) async {
+    try {
+      final result = await _remoteDataSource.getRateById(id);
+      return Right(result.data.toRate()!);
     } on ServerException catch (e) {
       return Left(ServerFailure(statusCode: e.statusCode, message: e.message));
     }

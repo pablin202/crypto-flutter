@@ -2,6 +2,8 @@ import 'package:crypto_app/core/errors/exceptions.dart';
 import 'package:crypto_app/src/coins/data/coin_cap_api/entities/response_coin.dart';
 import 'package:crypto_app/src/coins/data/coin_cap_api/entities/response_coins.dart';
 import 'package:crypto_app/src/coins/data/coin_cap_api/entities/response_history.dart';
+import 'package:crypto_app/src/coins/data/coin_cap_api/entities/response_rate.dart';
+import 'package:crypto_app/src/coins/data/coin_cap_api/entities/response_rates.dart';
 import 'package:dio/dio.dart';
 
 abstract class CoinCapRemoteDataSource {
@@ -11,6 +13,10 @@ abstract class CoinCapRemoteDataSource {
 
   Future<ResponseHistory> getHistoryById(
       String id, String interval, int startDate, int endDate);
+
+  Future<ResponseRates> getAllRates();
+
+  Future<ResponseRate> getRateById(String id);
 }
 
 class CoinCapRemoteDataSourceImpl extends CoinCapRemoteDataSource {
@@ -59,9 +65,11 @@ class CoinCapRemoteDataSourceImpl extends CoinCapRemoteDataSource {
   }
 
   @override
-  Future<ResponseHistory> getHistoryById(String id, String interval, int startDate, int endDate) async {
+  Future<ResponseHistory> getHistoryById(
+      String id, String interval, int startDate, int endDate) async {
     try {
-      final response = await _dio.get('/assets/$id/history?interval=$interval&start=$startDate&end=$endDate');
+      final response = await _dio.get(
+          '/assets/$id/history?interval=$interval&start=$startDate&end=$endDate');
 
       if (response.statusCode != 200) {
         throw ServerException(
@@ -71,6 +79,46 @@ class CoinCapRemoteDataSourceImpl extends CoinCapRemoteDataSource {
       }
 
       return ResponseHistory.fromJson(response.data);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: '505');
+    }
+  }
+
+  @override
+  Future<ResponseRates> getAllRates() async {
+    try {
+      final response = await _dio.get('/rates');
+
+      if (response.statusCode != 200) {
+        throw ServerException(
+          message: response.data,
+          statusCode: response.statusCode.toString(),
+        );
+      }
+
+      return ResponseRates.fromJson(response.data);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString(), statusCode: '505');
+    }
+  }
+
+  @override
+  Future<ResponseRate> getRateById(String id) async {
+    try {
+      final response = await _dio.get('/rates/$id');
+
+      if (response.statusCode != 200) {
+        throw ServerException(
+          message: response.data,
+          statusCode: response.statusCode.toString(),
+        );
+      }
+
+      return ResponseRate.fromJson(response.data);
     } on ServerException {
       rethrow;
     } catch (e) {

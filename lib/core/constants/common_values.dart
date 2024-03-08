@@ -1,0 +1,1 @@
+const defaultRateId = "united-states-dollar";

@@ -4,6 +4,7 @@ import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coins_cubit.da
 import 'package:crypto_app/src/coins/presentation/components/coin_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class CoinsScreen extends StatefulWidget {
   const CoinsScreen({super.key});
@@ -15,10 +16,29 @@ class CoinsScreen extends StatefulWidget {
 }
 
 class _CoinsScreenState extends State<CoinsScreen> {
+
   @override
   void initState() {
     super.initState();
-    context.read<CoinsCubit>().getAllCoins();
+    initialization(() {
+      context.read<CoinsCubit>().getAllCoins();
+    });
+  }
+
+  void initialization(Function callback) async {
+    // This is where you can initialize the resources needed by your app while
+    // the splash screen is displayed.  Remove the following example because
+    // delaying the user experience is a bad design practice!
+    // ignore_for_file: avoid_print
+    print('ready in 3...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('ready in 2...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('ready in 1...');
+    await Future.delayed(const Duration(seconds: 1));
+    print('go!');
+    callback();
+    FlutterNativeSplash.remove();
   }
 
   @override

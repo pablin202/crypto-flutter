@@ -5,6 +5,7 @@ import 'package:crypto_app/src/coins/data/coin_paprika_api/datasources/coin_papr
 import 'package:crypto_app/src/coins/data/coin_paprika_api/mappers/coin_mapper.dart';
 import 'package:crypto_app/src/coins/domain/models/coin.dart';
 import 'package:crypto_app/src/coins/domain/models/history.dart';
+import 'package:crypto_app/src/coins/domain/models/rates.dart';
 import 'package:crypto_app/src/coins/domain/repositories/coins_repository.dart';
 import 'package:dartz/dartz.dart';
 
@@ -36,4 +37,17 @@ class CoinsRepositoryImpl extends CoinsRepository {
     // TODO: implement getHistoryById
     throw UnimplementedError();
   }
+
+  @override
+  ResultFuture<List<Rate>> getRates() {
+    // TODO: implement getRates
+    throw UnimplementedError();
+  }
+
+  @override
+  ResultFuture<Rate> getRateById(String id) {
+    // TODO: implement getRateById
+    throw UnimplementedError();
+  }
+  
 }
