@@ -21,6 +21,7 @@ import 'package:crypto_app/src/coins/domain/usecases/save_prefer_rate.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/cubit/coin_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/cubit/history_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coins_cubit.dart';
+import 'package:crypto_app/src/settings/presentation/cubit/settings_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,12 +38,13 @@ Future<void> init() async {
 
   sl
     ..registerFactory(
-      () => CoinsCubit(
-        getAllCoins: sl(),
-      ),
+      () => CoinsCubit(getAllCoins: sl(), getPreferRate: sl()),
     )
     ..registerFactory(
       () => CoinCubit(getCoinById: sl()),
+    )
+    ..registerFactory(
+      () => SettingsCubit(getAllRates: sl()),
     )
     ..registerFactory(
       () => HistoryCubit(

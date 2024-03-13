@@ -46,6 +46,7 @@ dependencies:
   toggle_switch: ^2.1.0
   flutter_spinkit: ^5.2.0
   flutter_native_splash: ^2.3.7
+  palette_generator: ^0.3.3+3
 
 dev_dependencies:
   flutter_test:

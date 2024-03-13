@@ -12,6 +12,7 @@ extension CoinEntityExt on CoinEntity {
         imageUrl:
             "https://assets.coincap.io/assets/icons/${symbol.toLowerCase()}@2x.png",
         usdPrice: convertNumberString(priceUsd),
+        convertedPrice: 0.0,
         changePercent24Hr: convertPercentString(changePercent24Hr),
         supply: supply,
         maxSupply: maxSupply,

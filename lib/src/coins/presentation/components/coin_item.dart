@@ -1,3 +1,4 @@
+import 'package:crypto_app/core/extensions/context_extensions.dart';
 import 'package:crypto_app/src/coins/domain/models/coin.dart';
 import 'package:crypto_app/src/coins/domain/models/value_style.dart';
 import 'package:crypto_app/src/coins/presentation/coin_details/navigation/coin_details_args.dart';
@@ -17,11 +18,18 @@ class CoinItem extends StatelessWidget {
           Navigator.pushNamed(
             context,
             CoinScreen.routeName,
-            arguments: CoinDetailsScreenArguments(coin.id, coin.name),
+            arguments: CoinDetailsScreenArguments(
+                coin.id,
+                coin.name,
+                coin.imageUrl
+            ),
           );
         },
-        leading: CircularImage(
-          image: coin.imageUrl,
+        leading: Hero(
+          tag: 'coin_image',
+          child: CircularImage(
+            image: coin.imageUrl,
+          ),
         ),
         title: Text(
           coin.symbol,
@@ -51,7 +59,7 @@ class CoinValues extends StatelessWidget {
         children: <Widget>[
           // ignore: prefer_adjacent_string_concatenation
           Text(
-            "\$${coin.usdPrice}",
+            "${context.defaultRate?.currencySymbol}${coin.convertedPrice}",
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
 

@@ -3,6 +3,8 @@ import 'package:crypto_app/src/coins/presentation/coin_details/cubit/history_cub
 import 'package:crypto_app/src/coins/presentation/coin_details/views/coin_screen.dart';
 import 'package:crypto_app/src/coins/presentation/coin_list/cubit/coins_cubit.dart';
 import 'package:crypto_app/src/coins/presentation/coin_list/views/coins_screen.dart';
+import 'package:crypto_app/src/settings/presentation/cubit/settings_cubit.dart';
+import 'package:crypto_app/src/settings/presentation/views/settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'injection_container.dart';
@@ -29,6 +31,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
             ),
           ],
           child: const CoinScreen(),
+        ),
+        settings: settings,
+      );
+    case SettingsScreen.routeName:
+      return _pageBuilder(
+        (_) => BlocProvider(
+          create: (_) => sl<SettingsCubit>(),
+          child: const SettingsScreen(),
         ),
         settings: settings,
       );

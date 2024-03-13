@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+
 extension MapExt<T> on Map<String, dynamic>? {
   T? valueOrNull() {
     return this != null ? this as T : null;
@@ -20,4 +22,9 @@ extension IndexedIterable<E> on Iterable<E> {
     var i = 0;
     return map((e) => f(e, i++));
   }
+}
+
+extension EitherX<L, R> on Either<L, R> {
+  R asRight() => (this as Right).value; //
+  L asLeft() => (this as Left).value;
 }

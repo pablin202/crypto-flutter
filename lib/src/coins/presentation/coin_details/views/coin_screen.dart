@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:crypto_app/core/extensions/context_extensions.dart';
 import 'package:crypto_app/core/extensions/util_extensions.dart';
 import 'package:crypto_app/core/utils/number_utils.dart';
 import 'package:crypto_app/src/coins/domain/models/value_style.dart';
@@ -10,12 +11,14 @@ import 'package:crypto_app/src/coins/presentation/components/spacers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-
 import '../../components/progress_loading.dart';
 
 class CoinScreen extends StatefulWidget {
-  const CoinScreen({super.key});
+  const CoinScreen({super.key, this.size});
+
+  final Size? size;
 
   static const routeName = "/coin";
 
@@ -24,22 +27,48 @@ class CoinScreen extends StatefulWidget {
 }
 
 class _CoinScreenState extends State<CoinScreen> {
+  PaletteGenerator? paletteGenerator;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _updatePaletteGenerator(String imageUrl) async {
+    paletteGenerator = await PaletteGenerator.fromImageProvider(
+      NetworkImage(imageUrl),
+      size: const Size(50.0, 50.0),
+      region: Offset.zero & const Size(50.0, 50.0),
+      maximumColorCount: 20,
+    );
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments
         as CoinDetailsScreenArguments;
-    context.read<CoinCubit>().getCoinById(args.id);
+
+    if (paletteGenerator == null) {
+      _updatePaletteGenerator(args.imageUrl);
+    }
+
+    context
+        .read<CoinCubit>()
+        .getCoinById(args.id, context.defaultRate!.rateUsd);
     context.read<HistoryCubit>().getOneDayHistory(args.id);
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(args.name),
-          leading: const BackButton(),
+          backgroundColor: paletteGenerator?.dominantColor?.color,
+          title: Text(
+            args.name,
+            style: TextStyle(
+                color: paletteGenerator?.dominantColor?.titleTextColor),
+          ),
+          leading: BackButton(
+            color: paletteGenerator?.dominantColor?.titleTextColor,
+          ),
         ),
         body: Column(children: [
           BlocConsumer<CoinCubit, CoinState>(listenWhen: (context, state) {
@@ -60,13 +89,16 @@ class _CoinScreenState extends State<CoinScreen> {
                     // this row has full width
                     width: double.maxFinite,
                     child: Column(children: [
-                      CircularImage(
-                        image: state.coin.imageUrl,
-                        width: 60.0,
-                        height: 60.0,
+                      Hero(
+                        tag: 'coin_image',
+                        child: CircularImage(
+                          image: state.coin.imageUrl,
+                          width: 60.0,
+                          height: 60.0,
+                        ),
                       ),
                       Text(
-                        "\$${state.coin.usdPrice}",
+                        "${context.defaultRate?.currencySymbol}${state.coin.convertedPrice}",
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 32.0),
                       ),
@@ -255,6 +287,22 @@ class PercentText extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({super.key, required this.title, required this.palette});
+
+  final String title;
+  final PaletteGenerator palette;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: palette.dominantColor?.color,
+      title: Text(title),
+      leading: const BackButton(),
     );
   }
 }
