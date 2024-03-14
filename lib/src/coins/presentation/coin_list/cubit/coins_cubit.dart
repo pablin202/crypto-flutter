@@ -19,6 +19,8 @@ class CoinsCubit extends Cubit<CoinsState> {
   final GetAllCoins _getAllCoins;
   final GetPreferRate _getPreferRate;
 
+  List<Coin> _cachedCoins = [];
+
   Future<void> setPreferCoin(BuildContext context) async {
     final result = await _getPreferRate();
     result.fold((failure) => {}, (rate) {
@@ -35,7 +37,28 @@ class CoinsCubit extends Cubit<CoinsState> {
               convertedPrice:
                   convertNumberString((e.usdPrice * priceRate).toString())))
           .toList();
+      _cachedCoins = convertedCoins;
       emit(CoinsLoaded(convertedCoins));
     });
+  }
+
+  Future<void> filterCoins(String searchText) async {
+    if (_cachedCoins.isEmpty) {
+      emit(const CoinsError('No coins available'));
+      return;
+    }
+
+    if (searchText.isEmpty) {
+      emit(CoinsLoaded(_cachedCoins));
+      return;
+    }
+
+    var filteredCoins = _cachedCoins
+        .where((coin) =>
+            coin.name.toLowerCase().contains(searchText.toLowerCase()) ||
+            coin.symbol.toLowerCase().contains(searchText.toLowerCase()))
+        .toList();
+
+    emit(CoinsLoaded(filteredCoins));
   }
 }

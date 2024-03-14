@@ -71,6 +71,17 @@ class _CoinScreenState extends State<CoinScreen> {
           ),
         ),
         body: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Hero(
+              tag: 'coin_image_${args.name}',
+              child: CircularImage(
+                image: args.imageUrl,
+                width: 60.0,
+                height: 60.0,
+              ),
+            ),
+          ),
           BlocConsumer<CoinCubit, CoinState>(listenWhen: (context, state) {
             return state is CoinLoaded;
           }, listener: (BuildContext context, CoinState state) {
@@ -89,14 +100,6 @@ class _CoinScreenState extends State<CoinScreen> {
                     // this row has full width
                     width: double.maxFinite,
                     child: Column(children: [
-                      Hero(
-                        tag: 'coin_image',
-                        child: CircularImage(
-                          image: state.coin.imageUrl,
-                          width: 60.0,
-                          height: 60.0,
-                        ),
-                      ),
                       Text(
                         "${context.defaultRate?.currencySymbol}${state.coin.convertedPrice}",
                         style: const TextStyle(

@@ -26,7 +26,7 @@ class CoinItem extends StatelessWidget {
           );
         },
         leading: Hero(
-          tag: 'coin_image',
+          tag: 'coin_image_${coin.name}',
           child: CircularImage(
             image: coin.imageUrl,
           ),
